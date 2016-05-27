@@ -2,16 +2,23 @@ package com.jf.haozi.appauthorize.common.utils;
 
 import android.content.Context;
 import android.os.Environment;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.jf.haozi.appauthorize.common.base.BaseObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class FileUtil extends BaseObject {
 
 	private static String PROJECT_DIR;
+	private static String REGISGE_FILE;
 
 	/**
 	 * 检查存储卡状态
@@ -45,7 +52,8 @@ public class FileUtil extends BaseObject {
 	 * 将注册码写入文件
 	 * */
 	public static void writeToRegisteFile(String str) {
-		File file = new File(PROJECT_DIR + File.separator + "registe.key");
+		REGISGE_FILE = PROJECT_DIR + File.separator + "registe.key";
+		File file = new File(REGISGE_FILE);
 		if(!file.exists()) {
 			try {
 				file.createNewFile();
@@ -65,4 +73,62 @@ public class FileUtil extends BaseObject {
 		}
 	}
 
+	/**
+	 * 读取文本文件中的内容
+	 * */
+	public static String ReadTxtFile(String strFilePath){
+		String path = strFilePath;
+		//文件内容字符串
+		String content = "";
+		//打开文件
+		File file = new File(path);
+		//如果path是传递过来的参数，可以做一个非目录的判断
+		if (file.isDirectory()){
+			Log.d("TestFile", "The File doesn't not exist.");
+		}else{
+			try {
+				InputStream instream = new FileInputStream(file);
+				if (instream != null){
+					InputStreamReader inputreader = new InputStreamReader(instream);
+					BufferedReader buffreader = new BufferedReader(inputreader);
+					String line;
+					//分行读取
+					while (( line = buffreader.readLine()) != null) {
+						content += line + "\n";
+					}
+					instream.close();
+				}
+			}catch (java.io.FileNotFoundException e){
+				Log.d("TestFile", "The File doesn't not exist.");
+			}catch (IOException e){
+				Log.d("TestFile", e.getMessage());
+			}
+		}
+		return content;
+	}
+
+	public static boolean isRegisteFileExist(){
+		if(TextUtils.isEmpty(REGISGE_FILE)){
+			return false;
+		}
+		File file = new File(REGISGE_FILE);
+		if(file.exists()) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 读取文本文件中的内容
+	 * */
+	public static String ReadRegisteFile(){
+		if(TextUtils.isEmpty(REGISGE_FILE)){
+			return "";
+		}
+		File file = new File(REGISGE_FILE);
+		if(!file.exists()) {
+			return "";
+		}
+		return ReadTxtFile(REGISGE_FILE);
+	}
 }
